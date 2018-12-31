@@ -22,14 +22,21 @@ class TestCase:
         return y
 
     def set_random(self, n_points):
+        self.points_x = []
+        self.points_y = []
         self.period = rand.uniform(10, 50)
         self.n_points = n_points
         for i in range(0, len(self.factors)):
             self.factors[i] = rand.uniform(-20, 20)
         for i in range(0, n_points):
             x = rand.uniform(0, self.period)
-            y = self.function(x)
             self.points_x.append(x)
+
+        self.points_x.sort()
+
+        for i in range(0, n_points):
+
+            y = self.function(self.points_x[i])
             self.points_y.append(y)
 
     def set_from_file(self, file_path):
@@ -56,6 +63,16 @@ class TestCase:
         for i in range(0,self.n_points):
             f.write("%f \n%f \n" % (self.points_x[i], self.points_y[i]))
 
+    def save_to_csv(self, file_path):
+        f = open(file_path, "a")
+
+        f.write("%f," % self.period)
+        for i in range(0, len(self.factors)):
+            f.write("%f," % self.factors[i])
+        for i in range(0,self.n_points):
+            f.write("%f,%f," % (self.points_x[i], self.points_y[i]))
+        f.write("\n")
+
     def show(self):
         x = np.linspace(0, self.period, 201)
 
@@ -65,5 +82,7 @@ class TestCase:
 
 if __name__ == "__main__":
     case = TestCase()
-    case.set_random(50)
-    case.show()
+    for i in range(100000):
+        print(i)
+        case.set_random(100)
+        case.save_to_csv("dataset4.csv")
