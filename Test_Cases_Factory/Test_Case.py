@@ -82,7 +82,7 @@ class TestCase:
 
 if __name__ == "__main__":
     case = TestCase()
-    for i in range(100000):
+    for i in range(500000):
         print(i)
         case.set_random(100)
         case.save_to_csv("dataset4.csv")
