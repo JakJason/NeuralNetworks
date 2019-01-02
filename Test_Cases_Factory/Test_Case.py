@@ -1,13 +1,13 @@
 import random as rand
 import numpy as np
 import matplotlib.pyplot
-
+import csv
 
 class TestCase:
     def __init__(self):
 
         self.period = 1
-        self.n_points = 1
+        self.n_points = 100
         self.points_x = []
         self.points_y = []
         self.factors = [0, 0, 0, 0, 0,
@@ -17,8 +17,11 @@ class TestCase:
 
     def function(self, x):
         y = self.factors[0]/2
-        for i in range(1, len(self.factors)):
-            y = y + (self.factors[i] * np.sin(x * ((2 * i * np.pi)/self.period)))
+        for i in range(1, int(len(self.factors)/2)):
+
+            y = y + (self.factors[i] * np.sin(x * ((2 * i * np.pi)/self.period)))\
+                    + (self.factors[i] * np.cos(x * ((2 * i * np.pi)/self.period)))
+
         return y
 
     def set_random(self, n_points):
@@ -53,6 +56,23 @@ class TestCase:
             self.points_x.append(float(data[30 + i*2]))
             self.points_y.append(float(data[31 + i*2]))
 
+    def set_from_csv(self, file_path):
+        with open(file_path) as f:
+            reader = csv.reader(f, quoting=csv.QUOTE_NONNUMERIC)
+            for row in reader:
+                self.period = row[0]
+                self.factors = row[1:21]
+                for i in range(self.n_points):
+                    self.points_x.append(row[21 + i*2])
+                    self.points_y.append(row[22 + i*2])
+                break
+
+    def set_from_result(self, period, factors, points_x, points_y):
+        self.period = period
+        self.factors = factors
+        self.points_x = points_x
+        self.points_y = points_y
+
     def save_to_file(self, file_path):
         f = open(file_path, "w+")
         f.write("%f \n\n" % self.period)
@@ -75,14 +95,13 @@ class TestCase:
 
     def show(self):
         x = np.linspace(0, self.period, 201)
-
         matplotlib.pyplot.plot(x, self.function(x), 'b', self.points_x, self.points_y, 'r^')
         matplotlib.pyplot.show()
 
 
 if __name__ == "__main__":
     case = TestCase()
-    for i in range(500000):
+    for i in range(1):
         print(i)
         case.set_random(100)
-        case.save_to_csv("dataset4.csv")
+        case.save_to_csv("simpletestcase2.csv")
