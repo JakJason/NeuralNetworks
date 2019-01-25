@@ -86,7 +86,7 @@ def train_neural_network(x):
     hm_epochs = 100
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, './models/model/model.ckpt')
+        #saver.restore(sess, './models/model/model.ckpt')
         for epoch in range(hm_epochs):
             epoch_loss = 0
             i = 0
@@ -99,7 +99,8 @@ def train_neural_network(x):
                 epoch_loss += c
                 i += batchsize
             saver.save(sess, "./models/model/model.ckpt")
-            print('Epoch', epoch + 1, 'completed out of', hm_epochs, 'loss:', epoch_loss)
+            if(epoch%10==0):
+                print('Epoch', epoch + 1, 'completed out of', hm_epochs, 'loss:', epoch_loss)
         correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
         # correct = tf.equal(prediction, y)
         accuracy = tf.reduce_mean(tf.cast(correct, 'float'))

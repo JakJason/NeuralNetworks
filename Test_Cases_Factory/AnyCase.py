@@ -4,7 +4,7 @@ class AnyCase:
     def __init__(self, period):
 
         self.n_points = 100
-        self.period = 20
+        self.period = period
         self.points_x = np.linspace(0.1, self.period, self.n_points)
         self.points_y = np.linspace(0.1, self.period, self.n_points)
         self.function = lambda x : x

@@ -118,7 +118,9 @@ class TestCase:
 
     def show(self):
         x = np.linspace(self.points_x[0], self.points_x[-1], 201)
-        matplotlib.pyplot.plot(x, self.function(x), 'b', self.points_x, self.points_y, 'r^')
+        matplotlib.pyplot.plot(x, self.function(x), 'b', label="Funkcja S(x)")
+        matplotlib.pyplot.plot(self.points_x, self.points_y, 'r^', label="Próbkowane punkty")
+        matplotlib.pyplot.gca().legend()
         matplotlib.pyplot.show()
 
     def set_random_with_zeros(self, n_points, max_factor):
@@ -173,6 +175,24 @@ class TestCase:
             self.points_y[i] = self.points_y[i] + self.av_y
         self.av_y = 0
 
+    def set_flat(self, n_points):
+        self.points_x = []
+        self.points_y = []
+        self.period = rand.uniform(10, 50)
+        self.factors = [0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0]
+        for i in range(0, n_points):
+            x = (i * self.period)/self.n_points
+            self.points_x.append(x)
+
+        for i in range(0, n_points):
+            y = self.function(self.points_x[i])
+            self.points_y.append(y)
+
     def print(self):
         print(self.factors)
         print(self.period)
@@ -180,15 +200,9 @@ class TestCase:
 
 if __name__ == "__main__":
     case = TestCase()
-
     case.set_random(100, 200)
     case.show()
-    case.print()
 
-    # for i in range(200000):
-    #     case.set_random(100, 200)
-    #     case.save_to_csv('dataset.csv')
-    #
     # for i in range(200000):
     #     case.set_random(100, 100)
     #     case.save_to_csv('dataset.csv')

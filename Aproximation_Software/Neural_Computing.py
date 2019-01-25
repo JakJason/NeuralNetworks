@@ -3,7 +3,7 @@ from Test_Cases_Factory import Test_Case, AnyCase
 import numpy as np
 import matplotlib
 
-n_input_nodes = 400
+n_input_nodes = 200
 n_hidden_nodes = [150, 150]
 n_output_nodes = 31
 
@@ -31,13 +31,16 @@ saver = tf.train.Saver()
 
 
 def function(x):
-    # return 16 * x * np.sin(3*x)
-    return 8 * (x-10)**2
-    # return 8 * x
-    # return 512 * np.log10(x)
-    # return (2**x)/1024
-    # return (x**3)/32
-
+    # return x * np.sin(3*x)
+    # return 10*(x-10)/np.abs(x-10)
+    # return 0.1*(x-10)**4 - (x-10)**3 - 34*((x-10)**2) - 21*(x-10) + 6
+    # return (x-10)**2
+    # return x
+    # return 32 * np.log10(x)
+    # return (2**x)/5000
+    # return (x-10)**3
+    # return 2*x/x
+    return 3*np.cos(2*x) + 2*np.sin(3*x)
 
 def test_model(model_path, test_case):
     prediction = neural_network_model(x)
@@ -45,7 +48,7 @@ def test_model(model_path, test_case):
     # case1 = Test_Case.TestCase()
     # case1.set_from_csv(test_case)
 
-    case1 = AnyCase.AnyCase(25)
+    case1 = AnyCase.AnyCase(20)
     case1.set_function(function)
 
     case2 = Test_Case.TestCase()
@@ -56,14 +59,14 @@ def test_model(model_path, test_case):
         features.append(case1.points_x[i])
         features.append(case1.points_y[i] - case2.av_y)
 
-    s = features[-2] - features[0]
-    f1 = features[:100]
-    for i in range(50):
-        f1[i*2] = f1[i*2] - s
-    f2 = features[100:]
-    for i in range(50):
-        f2[i*2] = f2[i*2] + s
-    features = f1 + features + f2
+    # s = features[-2] - features[0]
+    # f1 = features[:100]
+    # for i in range(50):
+    #     f1[i*2] = f1[i*2] - s
+    # f2 = features[100:]
+    # for i in range(50):
+    #     f2[i*2] = f2[i*2] + s
+    # features = f1 + features + f2
 
     features = np.array(features)
     with tf.Session() as sess:
@@ -71,19 +74,60 @@ def test_model(model_path, test_case):
         saver.restore(sess, model_path)
         result = sess.run(prediction, feed_dict={x: [features]})
 
+    # print(result[0][0])
+    # print(case2.av_y)
+    # print(result[0][1:])
+
     case2.set_from_result(result[0][0], result[0][1:], case1.av_y, case1.points_x, case1.points_y)
-    l1 = np.linspace(0 - case1.period/2, 3*case1.period/2, 401)
-    l2 = np.linspace(0 - case1.period/2, 3*case1.period/2, 401)
-    # l1 = np.linspace(0.1, case1.period, 401)
-    # l2 = np.linspace(0.1, case1.period, 401)
+    # l1 = np.linspace(0 - case1.period/2, 3*case1.period/2, 401)
+    l1 = np.linspace(0.001, case1.period, 401)
     matplotlib.pyplot.title('Function recovery')
-    matplotlib.pyplot.subplot(2, 1, 1)
-    matplotlib.pyplot.plot(l1, case1.function(l1), 'b', case1.points_x, case1.points_y, 'r^')
-    matplotlib.pyplot.ylabel('Original plot')
-    matplotlib.pyplot.subplot(2, 1, 2)
-    matplotlib.pyplot.plot(l2, case2.function(l2), 'b', case1.points_x, case1.points_y, 'r^')
-    matplotlib.pyplot.ylabel('Approximated plot')
+
+    matplotlib.pyplot.figure(1)
+    matplotlib.pyplot.subplot(3, 1, 1)
+    matplotlib.pyplot.plot(l1, case1.function(l1), 'b', label="Original function")
+    matplotlib.pyplot.plot(case1.points_x, case1.points_y, 'r^', label="Input points")
+    matplotlib.pyplot.gca().legend()
+    matplotlib.pyplot.subplot(3, 1, 2)
+    matplotlib.pyplot.plot(l1, case2.function(l1), 'b', label="Approximated function")
+    matplotlib.pyplot.plot(case1.points_x, case1.points_y, 'r^', label="Input points")
+    matplotlib.pyplot.gca().legend()
+    matplotlib.pyplot.subplot(3, 1, 3)
+    matplotlib.pyplot.plot(l1, case1.function(l1) - case2.function(l1), 'b', label="Diffrence")
+    matplotlib.pyplot.gca().legend()
+
+    n = len(case2.points_x)
+    s = 0
+    for i in range(0, n):
+        s = s + (case1.points_y[i] - case2.function(case2.points_x[i]))**2
+
+    print("Root Mean Square Error")
+    print(np.sqrt(s/n))
+
+    print("Rel Root Mean Square Error:")
+    T = float(max(case2.points_y) - min(case2.points_y))
+    rel_s = (np.sqrt(s/n))/T
+    print(rel_s)
+
+    print("Cut Root Mean Square Error:")
+    for i in range(10, 80):
+        s = s + (case1.points_y[i] - case2.function(case2.points_x[i]))**2
+    print(np.sqrt(s/(n-20)))
+
+    print("RC Root Mean Square Error:")
+    rel_s2 = (np.sqrt(s/(n-20)))/T
+    print(rel_s2)
+
+    print(str(format(rel_s, '.5g'))+ " & " + str(format(np.sqrt(s/(n-20)), '.5g'))+ " & " + str(format(rel_s2, '.5g'))+ " \\\\ ")
+
+
+    matplotlib.pyplot.figure(2)
+    matplotlib.pyplot.plot(l1, case1.function(l1), 'b', label="Funkcja oryginalna f(x)")
+    matplotlib.pyplot.plot(l1, case2.function(l1), 'r', label="Aproksymacja S(x)")
+    matplotlib.pyplot.plot(l1, case1.function(l1) - case2.function(l1), 'g', label="Różnica f(x) - S(x)")
+    matplotlib.pyplot.gca().legend()
+
     matplotlib.pyplot.show()
 
 
-test_model('../Network_School/models/model 400-150-150-31 98.8pr/model.ckpt', 'testcase1.csv')
+test_model('../Network_School/models/model 200-150-150-31 98.83pr/model.ckpt', 'testcase1.csv')
