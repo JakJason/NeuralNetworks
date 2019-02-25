@@ -38,19 +38,19 @@ def function(x):
     # return x
     # return 32 * np.log10(x)
     # return (2**x)/5000
-    # return (x-10)**3
+    return 0.3*(x-10)**3
     # return 2*x/x
-    return 3*np.cos(2*x) + 2*np.sin(3*x)
+    # return 3*np.cos(2*x) + 2*np.sin(3*x)
+    # return (x/x) * np.random.uniform(-50, 50)
+    # return (x/x) * np.random.normal(0, 20)
 
 def test_model(model_path, test_case):
     prediction = neural_network_model(x)
 
     # case1 = Test_Case.TestCase()
     # case1.set_from_csv(test_case)
-
     case1 = AnyCase.AnyCase(20)
     case1.set_function(function)
-
     case2 = Test_Case.TestCase()
 
     features = []
@@ -81,20 +81,20 @@ def test_model(model_path, test_case):
     case2.set_from_result(result[0][0], result[0][1:], case1.av_y, case1.points_x, case1.points_y)
     # l1 = np.linspace(0 - case1.period/2, 3*case1.period/2, 401)
     l1 = np.linspace(0.001, case1.period, 401)
-    matplotlib.pyplot.title('Function recovery')
+
 
     matplotlib.pyplot.figure(1)
-    matplotlib.pyplot.subplot(3, 1, 1)
-    matplotlib.pyplot.plot(l1, case1.function(l1), 'b', label="Original function")
-    matplotlib.pyplot.plot(case1.points_x, case1.points_y, 'r^', label="Input points")
+    # matplotlib.pyplot.subplot(3, 1, 1)
+    # matplotlib.pyplot.plot(l1, case1.function(l1), 'b', label="Original function")
+    # matplotlib.pyplot.plot(case1.points_x, case1.points_y, 'r^', label="Input points")
+    # matplotlib.pyplot.gca().legend()
+    # matplotlib.pyplot.subplot(3, 1, 2)
+    matplotlib.pyplot.plot(l1, case2.function(l1), 'b', label="Aproksymowana funkcja")
+    matplotlib.pyplot.plot(case1.points_x, case1.points_y, 'r^', label="dane wejściowe")
     matplotlib.pyplot.gca().legend()
-    matplotlib.pyplot.subplot(3, 1, 2)
-    matplotlib.pyplot.plot(l1, case2.function(l1), 'b', label="Approximated function")
-    matplotlib.pyplot.plot(case1.points_x, case1.points_y, 'r^', label="Input points")
-    matplotlib.pyplot.gca().legend()
-    matplotlib.pyplot.subplot(3, 1, 3)
-    matplotlib.pyplot.plot(l1, case1.function(l1) - case2.function(l1), 'b', label="Diffrence")
-    matplotlib.pyplot.gca().legend()
+    # matplotlib.pyplot.subplot(3, 1, 3)
+    # matplotlib.pyplot.plot(l1, case1.function(l1) - case2.function(l1), 'b', label="Diffrence")
+    # matplotlib.pyplot.gca().legend()
 
     n = len(case2.points_x)
     s = 0

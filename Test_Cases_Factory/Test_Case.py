@@ -165,6 +165,27 @@ class TestCase:
             y = self.function(self.points_x[i])
             self.points_y.append(y)
 
+    def set_from_input_data(self, input_data):
+        with open(input_data) as f:
+            reader = csv.reader(f, quoting=csv.QUOTE_NONNUMERIC)
+            for row in reader:
+                self.points_x.append(row[0])
+                self.points_y.append(row[1])
+
+    def clear(self):
+        self.period = 1
+        self.n_points = 100
+        self.points_x = []
+        self.points_y = []
+        self.factors = [0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0]
+        self.av_y = 0
+        self.av_x = 0
+
     def averagize(self):
         self.av_y = sum(self.points_y)/len(self.points_y)
         for i in range(len(self.points_y)):
@@ -199,6 +220,7 @@ class TestCase:
 
 
 if __name__ == "__main__":
+    pass
     case = TestCase()
     case.set_random(100, 200)
     case.show()
